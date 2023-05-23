@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    private new Rigidbody2D rb;
+    private Rigidbody2D rb;
 
     [SerializeField] float maxSpeed = 10f;
     [SerializeField] float movePower = 5f;
@@ -19,9 +19,9 @@ public class PlayerController : MonoBehaviour
     private new SpriteRenderer renderer;
     private Vector2 inputDir;
     private bool isGrounded;
-    private bool isHited;
+    //private bool isHited;
 
-    private Coroutine moveRoutine;
+    //private Coroutine moveRoutine;
 
     private void Awake()
     {
@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //GroundCheck();
+        GroundCheck();
     }
 
     private void Move()
@@ -65,14 +65,7 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnJump(InputValue value)
-    {/*
-        if (!value.isPressed)
-            return;
-        if (!isGrounded)
-            return;
-        if (isHited)
-            return;
-        */
+    {
         Jump();
     }
 
@@ -83,23 +76,24 @@ public class PlayerController : MonoBehaviour
 
     private void GroundCheck()
     {
-        Debug.DrawRay(transform.position, Vector2.down * 1.5f, Color.red);
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.5f, groundMask);
         if (hit.collider != null)
         {
             isGrounded = true;
-            animator.SetBool("IsGrounded", true);
+            animator.SetBool("IsGround", true);
+            Debug.DrawRay(transform.position, new Vector3(hit.point.x, hit.point.y, 0) - transform.position, Color.red);
 
             // Smooth landing
-            if (rb.velocity.y < -3)
+            if (rb.velocity.y < -6)
             {
-                rb.velocity = new Vector2(rb.velocity.x, -3);
+                rb.velocity = new Vector2(rb.velocity.x, -6);
             }
         }
         else
         {
             isGrounded = false;
-            animator.SetBool("IsGrounded", false);
+            animator.SetBool("IsGround", false);
+            Debug.DrawRay(transform.position, Vector2.down * 1.5f, Color.red);
         }
     }
 
@@ -121,7 +115,7 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
     }
-
+    /*
     public void Hit()
     {
         StartCoroutine(HitRoutine());
@@ -146,5 +140,5 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         animator.SetBool("IsGround", false);
-    }
+    }*/
 }
