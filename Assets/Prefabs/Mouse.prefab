@@ -42,9 +42,9 @@ GameObject:
   - component: {fileID: 6746382896590251598}
   - component: {fileID: 3071607975629446746}
   - component: {fileID: 5356979789009621}
-  - component: {fileID: 5185275638055035536}
   - component: {fileID: 5669743215148161246}
   - component: {fileID: 9108797386462600996}
+  - component: {fileID: -5088683160169031280}
   m_Layer: 0
   m_Name: Mouse
   m_TagString: Untagged
@@ -117,7 +117,7 @@ SpriteRenderer:
   m_Size: {x: 1.1, y: 0.73}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &5356979789009621
@@ -141,22 +141,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!58 &5185275638055035536
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6182085406741117144}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.1}
-  serializedVersion: 2
-  m_Radius: 0.55
 --- !u!114 &5669743215148161246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cd4126887c52be47831fa48197f7b20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
+  moveSpeed: 2
   groundCheckPosition: {fileID: 8092345179379203675}
   groundLayer:
     serializedVersion: 2
@@ -195,3 +179,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &-5088683160169031280
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6182085406741117144}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -0.05}
+  serializedVersion: 2
+  m_Radius: 0.3
