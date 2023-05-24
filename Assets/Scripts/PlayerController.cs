@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private new SpriteRenderer renderer;
     private Vector2 inputDir;
-    private bool isGrounded;
+    [SerializeField] bool isGrounded;
     //private bool isHited;
 
     //private Coroutine moveRoutine;
