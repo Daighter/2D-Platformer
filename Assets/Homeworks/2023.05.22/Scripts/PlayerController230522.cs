@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController230522 : MonoBehaviour
 {
-    private new Rigidbody2D rb;
+    private Rigidbody2D rb;
 
     [SerializeField] float maxSpeed = 10f;
     [SerializeField] float movePower = 5f;
