@@ -1,99 +1,236 @@
+using BeeState;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.U2D.Path.GUIFramework;
 using UnityEngine;
 
 public class Bee : MonoBehaviour
 {
-    [SerializeField] float moveSpeed = 1f;
-    [SerializeField] float detectRange = 4f;
-    [SerializeField] float attackRange = 1f;
+    public float moveSpeed = 3f;
+    public float detectRange = 10f;
+    public float attackRange = 6f;
+    public float runRange = 2f;
 
-    public enum State { Idle, Trace, Return, Attack }
+    private StateBase[] states;
+    public State curState;
 
-    private State curState;
+    public Transform player;
+    public Vector3 prevPos;
 
-    private Transform player;
+    private void Awake()
+    {
+        states = new StateBase[(int)State.Size];
+        states[(int)State.Idle] = new IdleState(this);
+        states[(int)State.Trace] = new TraceState(this);
+        states[(int)State.Return] = new ReturnState(this);
+        states[(int)State.Attack] = new AttackState(this);
+        states[(int)State.Attack] = new RunawayState(this);
 
-    Vector3 prevPos;
+    }
 
     private void Start()
     {
-        prevPos = transform.position;
         curState = State.Idle;
+        states[(int)curState].Enter();
+        prevPos = transform.position;
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void Update()
     {
-        switch (curState)
-        {
-            case State.Idle:
-                IdleUpdate();
-                break;
-            case State.Trace:
-                TraceUpdate();
-                break;
-            case State.Return:
-                ReturnUpdate();
-                break;
-            case State.Attack:
-                AttackUpdate();
-                break;
-        }
+        states[(int)curState].Update();
     }
 
-    private void IdleUpdate()
+    public void ChangeState(State state)
     {
-        if (Vector2.Distance(player.position, transform.position) <= detectRange)
-        {
-            curState = State.Trace;
-        }
+        states[(int)curState].Exit();
+        curState = state;
+        states[(int)curState].Enter();
     }
 
-    private void TraceUpdate()
+    private void OnDrawGizmos()
     {
-        Vector2 dir = (player.position - transform.position).normalized;
-        transform.Translate(dir * moveSpeed * Time.deltaTime);
-
-        if (Vector2.Distance(player.position, transform.position) > detectRange)
-        {
-            curState = State.Return;
-        }
-        else if (Vector2.Distance(player.position, transform.position) <= attackRange)
-        {
-            curState = State.Attack;
-        }
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, detectRange);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, runRange);
     }
+}
 
-    private void ReturnUpdate()
+namespace BeeState
+{
+    public enum State { Idle, Trace, Return, Attack, Runaway, Size }
+
+    public class IdleState : StateBase
     {
-        Vector2 dir = (prevPos - transform.position).normalized;
-        transform.Translate(dir * moveSpeed * Time.deltaTime);
+        private Bee bee;
+        private float idieTime;
 
-        if (Vector2.Distance(transform.position, prevPos) < 0.02f)
+        public IdleState(Bee bee)
         {
-            curState = State.Idle;
-        }
-        else if (Vector2.Distance(player.position, transform.position) <= detectRange)
-        {
-            curState = State.Trace;
+            this.bee = bee;
         }
 
+        public override void Enter()
+        {
+            
+        }
+
+        public override void Update()
+        {
+            if (Vector2.Distance(bee.player.position, bee.transform.position) <= bee.detectRange)
+            {
+                bee.ChangeState(State.Trace);
+            }
+        }
+
+        public override void Exit()
+        {
+            
+        }
     }
 
-    private float attackCoolTime = 1;
-
-    private void AttackUpdate()
+    public class TraceState : StateBase
     {
-        attackCoolTime += Time.deltaTime;
-        if (attackCoolTime > 1f)
+        private Bee bee;
+
+        public TraceState(Bee bee)
         {
-            Debug.Log("Attack");
-            attackCoolTime = 0;
+            this.bee = bee;
         }
-        else if (Vector2.Distance(player.position, transform.position) > attackRange)
+
+        public override void Enter()
         {
-            curState = State.Trace;
+            
+        }
+
+        public override void Update()
+        {
+            Vector2 dir = (bee.player.position - bee.transform.position).normalized;
+            bee.transform.Translate(dir * bee.moveSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(bee.player.position, bee.transform.position) <= bee.attackRange)
+            {
+                bee.ChangeState(State.Attack);
+            }
+            else if (Vector2.Distance(bee.player.position, bee.transform.position) > bee.detectRange)
+            {
+                bee.ChangeState(State.Return);
+            }
+        }
+
+        public override void Exit()
+        {
+            
         }
     }
+
+    public class ReturnState : StateBase
+    {
+        private Bee bee;
+
+        public ReturnState(Bee bee)
+        {
+            this.bee = bee;
+        }
+
+        public override void Enter()
+        {
+            
+        }
+
+        public override void Update()
+        {
+            Vector2 dir = (bee.prevPos - bee.transform.position).normalized;
+            bee.transform.Translate(dir * bee.moveSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(bee.transform.position, bee.prevPos) < 0.02f)
+            {
+                bee.ChangeState(State.Idle);
+            }
+            else if (Vector2.Distance(bee.player.position, bee.transform.position) <= bee.detectRange)
+            {
+                bee.ChangeState(State.Trace);
+            }
+        }
+
+        public override void Exit()
+        {
+            
+        }
+    }
+
+    public class AttackState : StateBase
+    {
+        private Bee bee;
+        private float attackCoolTime = 1;
+
+        public AttackState(Bee bee)
+        {
+            this.bee = bee;
+        }
+
+        public override void Enter()
+        {
+            
+        }
+
+        public override void Update()
+        {
+            attackCoolTime += Time.deltaTime;
+            if (attackCoolTime > 0.5f)
+            {
+                Debug.Log("Attack");
+                attackCoolTime = 0;
+            }
+
+            if (Vector2.Distance(bee.player.position, bee.transform.position) > bee.attackRange)
+            {
+                bee.ChangeState(State.Trace);
+            }
+            else if (Vector2.Distance(bee.player.position, bee.transform.position) <= bee.runRange)
+            {
+                bee.ChangeState(State.Runaway);
+            }
+        }
+
+        public override void Exit()
+        {
+            
+        }
+    }
+
+    public class RunawayState : StateBase
+    {
+        private Bee bee;
+
+        public RunawayState(Bee bee)
+        {
+            this.bee = bee;
+        }
+
+        public override void Enter()
+        {
+
+        }
+
+        public override void Update()
+        {
+            Vector2 dir = (bee.transform.position - bee.player.position).normalized;
+            bee.transform.Translate(dir * bee.moveSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(bee.player.position, bee.transform.position) > bee.runRange)
+            {
+                bee.ChangeState(State.Attack);
+            }
+        }
+
+        public override void Exit()
+        {
+
+        }
+    }
+        
 }
